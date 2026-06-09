@@ -1,0 +1,38 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+  branches:
+    include:
+      - QA
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '20.x'
+    displayName: 'Instalar Node.js'
+
+  - script: |
+      echo "Directorio actual antes de instalar dependencias:"
+      pwd
+      echo "Instalando dependencias con npm ci..."
+      npm ci
+      ls -la 
+      ls -la node_modules
+      
+    displayName: 'Instalar dependencias y construir aplicación'
+
+
+  - task: AzureRmWebAppDeployment@4
+    inputs:
+      ConnectionType: 'AzureRM'
+      azureSubscription: 'nego-sp-sc'
+      appType: 'webAppLinux'
+      WebAppName: 'nego-qa'
+      packageForLinux: '.'
+      RuntimeStack: 'NODE|20-lts'

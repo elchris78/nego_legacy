@@ -1,0 +1,66 @@
+
+# Node.js with React
+# Build a Node.js project that uses React.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
+trigger:
+  branches:
+    include:
+      - QA
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '20.x'
+    displayName: 'Instalar Node.js'
+
+  - script: |
+      echo "Instalando dependencias con npm ci..."
+      npm ci
+    displayName: 'Instalar dependencias'
+
+  - script: |
+        echo "Contenido actual de next.config.mjs:"
+        cat next.config.mjs
+    displayName: 'Mostrar contenido de next.config.mjs'
+    
+
+  - script: |
+      echo "Construyendo la aplicación Next.js en modo standalone..."
+      npm run build
+    displayName: 'Construir aplicación'
+
+  - script: |
+      echo "Exportando resultado de la construcción al directorio de artefactos..."
+      cp -R .next $(Build.ArtifactStagingDirectory)
+      ls -la $(Build.ArtifactStagingDirectory)
+      ls -la $(Build.ArtifactStagingDirectory)/.next
+    displayName: 'Exportar artefactos'
+
+  - script: |
+      echo "Moviendo carpetas necesarias dentro de standalone..."
+      cp -R $(Build.ArtifactStagingDirectory)/.next/static $(Build.ArtifactStagingDirectory)/.next/standalone/.next/static
+    displayName: 'Mover carpetas'
+
+  - task: ArchiveFiles@2
+    inputs:
+      rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/.next'
+      includeRootFolder: false
+      archiveType: 'zip'
+      archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+      replaceExistingArchive: true
+      verbose: true
+    displayName: 'Comprimir proyecto'
+
+  - task: AzureRmWebAppDeployment@4
+    inputs:
+      ConnectionType: 'AzureRM'
+      azureSubscription: 'nego-sp-sc'
+      appType: 'webAppLinux'
+      WebAppName: 'nego-qa'
+      packageForLinux: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+      StartupCommand: 'node standalone/server.js'
+    displayName: 'Desplegar en Azure'

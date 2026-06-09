@@ -1,0 +1,56 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@/app/*": ["src/app/*"],
+      "@/lib/*": ["src/lib/*"],
+      "@/utils/*": ["src/lib/utils/*"],
+
+      "@/hooks/*": ["src/lib/hooks/*"],
+      "@/admin/*": ["src/app/admin/*"],
+      "@/ui/*": ["src/components/ui/*"],
+      "@/menus/*": ["src/components/layout/menus/*"],
+      "@/Modals/*": ["src/components/ui/Modals/*"],
+      "@/Toast/*": ["src/components/ui/Toast/*"],
+      "@/assets/*": ["public/assets/*"],
+      "@/Asset/*": ["public/assets/*"], // TODO: Refactorizado cambiarse con el tiempo a assets
+      "@/context/*": ["src/lib/context/*"],
+      "@/services/*": ["src/lib/services/*"],
+      "@/store": ["src/lib/store/store.ts"],
+    },
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "typeRoots": ["src/lib/types", "node_modules/@types"]
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "src/**/*.svg"
+
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

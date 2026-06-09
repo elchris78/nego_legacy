@@ -1,0 +1,38 @@
+# Node.js
+# Build a general Node.js project with npm.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
+trigger:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '20.x'
+    displayName: 'Instalar Node.js'
+
+  - script: |
+      echo "Directorio actual antes de instalar dependencias:"
+      pwd
+      echo "Instalando dependencias con npm ci..."
+      npm ci
+      echo "Dependencias instaladas. Directorio actual:"
+      pwd
+      echo "Contenido del directorio actual:"
+      ls -la
+      npm run build
+    displayName: 'Instalar dependencias'
+
+  - task: AzureWebApp@1
+    inputs:
+      azureSubscription: 'nego-sp-sc'
+      appType: 'webAppLinux'
+      appName: 'nego-qa'
+      package: '.'
+      startUpCommand: 'npm run start'
+    displayName: 'Desplegar aplicación a Azure App Service'
